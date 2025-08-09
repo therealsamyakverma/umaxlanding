@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WWE Apparel - Official Wrestling Gear</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wwe-red': '#FF0000',
+                        'wwe-blue': '#0066CC',
+                        'wwe-gold': '#FFD700'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Sample data
+        const wrestlers = [
+            { id: 1, name: "John Cena", image: "https://via.placeholder.com/120x120/FF0000/FFFFFF?text=JC" },
+            { id: 2, name: "Roman Reigns", image: "https://via.placeholder.com/120x120/0066CC/FFFFFF?text=RR" },
+            { id: 3, name: "Becky Lynch", image: "https://via.placeholder.com/120x120/FFD700/000000?text=BL" },
+            { id: 4, name: "Seth Rollins", image: "https://via.placeholder.com/120x120/800080/FFFFFF?text=SR" },
+            { id: 5, name: "Charlotte Flair", image: "https://via.placeholder.com/120x120/FF69B4/FFFFFF?text=CF" },
+            { id: 6, name: "Brock Lesnar", image: "https://via.placeholder.com/120x120/000000/FFFFFF?text=BL" },
+            { id: 7, name: "Ronda Rousey", image: "https://via.placeholder.com/120x120/FF4500/FFFFFF?text=RR" },
+            { id: 8, name: "AJ Styles", image: "https://via.placeholder.com/120x120/32CD32/FFFFFF?text=AJ" }
+        ];
+
+        const products = [
+            { id: 1, name: "John Cena 'Never Give Up' T-Shirt", price: 29.99, wrestlerId: 1, image: "https://via.placeholder.com/300x300/FF0000/FFFFFF?text=Cena+Shirt" },
+            { id: 2, name: "Roman Reigns Tribal Chief Hoodie", price: 49.99, wrestlerId: 2, image: "https://via.placeholder.com/300x300/0066CC/FFFFFF?text=Reigns+Hoodie" },
+            { id: 3, name: "Becky Lynch 'The Man' Tank Top", price: 24.99, wrestlerId: 3, image: "https://via.placeholder.com/300x300/FFD700/000000?text=Lynch+Tank" },
+            { id: 4, name: "Seth Rollins 'Visionary' Jacket", price: 79.99, wrestlerId: 4, image: "https://via.placeholder.com/300x300/800080/FFFFFF?text=Rollins+Jacket" },
+            { id: 5, name: "Charlotte Flair 'Queen' Dress", price: 89.99, wrestlerId: 5, image: "https://via.placeholder.com/300x300/FF69B4/FFFFFF?text=Flair+Dress" },
+            { id: 6, name: "Brock Lesnar 'Beast' T-Shirt", price: 34.99, wrestlerId: 6, image: "https://via.placeholder.com/300x300/000000/FFFFFF?text=Lesnar+Shirt" },
+            { id: 7, name: "Ronda Rousey 'Rowdy' Leggings", price: 39.99, wrestlerId: 7, image: "https://via.placeholder.com/300x300/FF4500/FFFFFF?text=Rousey+Leggings" },
+            { id: 8, name: "AJ Styles 'Phenomenal' Jersey", price: 69.99, wrestlerId: 8, image: "https://via.placeholder.com/300x300/32CD32/FFFFFF?text=Styles+Jersey" },
+            { id: 9, name: "John Cena Cap", price: 19.99, wrestlerId: 1, image: "https://via.placeholder.com/300x300/FF0000/FFFFFF?text=Cena+Cap" },
+            { id: 10, name: "Roman Reigns Wristband", price: 14.99, wrestlerId: 2, image: "https://via.placeholder.com/300x300/0066CC/FFFFFF?text=Reigns+Wristband" },
+            { id: 11, name: "Becky Lynch Sunglasses", price: 29.99, wrestlerId: 3, image: "https://via.placeholder.com/300x300/FFD700/000000?text=Lynch+Glasses" },
+            { id: 12, name: "Seth Rollins Beanie", price: 24.99, wrestlerId: 4, image: "https://via.placeholder.com/300x300/800080/FFFFFF?text=Rollins+Beanie" }
+        ];
+
+        function App() {
+            const [selectedWrestler, setSelectedWrestler] = useState(null);
+            const [filteredProducts, setFilteredProducts] = useState(products);
+            const [isNavSticky, setIsNavSticky] = useState(false);
+
+            useEffect(() => {
+                const handleScroll = () => {
+                    setIsNavSticky(window.scrollY > 100);
+                };
+
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const handleWrestlerClick = (wrestlerId) => {
+                if (selectedWrestler === wrestlerId) {
+                    setSelectedWrestler(null);
+                    setFilteredProducts(products);
+                } else {
+                    setSelectedWrestler(wrestlerId);
+                    setFilteredProducts(products.filter(product => product.wrestlerId === wrestlerId));
+                }
+            };
+
+            const clearFilter = () => {
+                setSelectedWrestler(null);
+                setFilteredProducts(products);
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {/* Navigation Bar */}
+                    <nav className={`bg-white shadow-lg transition-all duration-300 ${isNavSticky ? 'sticky top-0 z-50' : ''}`}>
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex justify-between items-center h-16">
+                                {/* Logo */}
+                                <div className="flex-shrink-0">
+                                    <div className="flex items-center">
+                                        <div className="w-10 h-10 bg-wwe-red rounded-full flex items-center justify-center">
+                                            <span className="text-white font-bold text-lg">WWE</span>
+                                        </div>
+                                        <span className="ml-2 text-xl font-bold text-gray-900">Apparel</span>
+                                    </div>
+                                </div>
+
+                                {/* Search Bar */}
+                                <div className="hidden md:block flex-1 max-w-md mx-8">
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            placeholder="Search for gear..."
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-wwe-red focus:border-transparent"
+                                        />
+                                        <button className="absolute right-2 top-2 text-gray-400 hover:text-wwe-red">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Menu Links */}
+                                <div className="hidden md:flex items-center space-x-8">
+                                    <a href="#" className="text-gray-700 hover:text-wwe-red transition-colors duration-200">Home</a>
+                                    <a href="#" className="text-gray-700 hover:text-wwe-red transition-colors duration-200">Superstars</a>
+                                    <a href="#" className="text-gray-700 hover:text-wwe-red transition-colors duration-200">Apparel</a>
+                                    <a href="#" className="text-gray-700 hover:text-wwe-red transition-colors duration-200">Sale</a>
+                                </div>
+
+                                {/* Mobile Menu Button */}
+                                <div className="md:hidden">
+                                    <button className="text-gray-700 hover:text-wwe-red">
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* Hero Section */}
+                    <div className="bg-gradient-to-r from-wwe-red to-wwe-blue text-white py-20">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                                OFFICIAL WWE APPAREL
+                            </h1>
+                            <p className="text-xl md:text-2xl mb-8">
+                                Represent your favorite Superstars with authentic gear
+                            </p>
+                            <button className="bg-wwe-gold text-black px-8 py-3 rounded-lg font-bold text-lg hover:bg-yellow-300 transition-colors duration-200">
+                                SHOP NOW
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Shop Superstars Section */}
+                    <div className="py-16 bg-white">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
+                                Shop Superstars
+                            </h2>
+                            
+                            {/* Filter Status */}
+                            {selectedWrestler && (
+                                <div className="text-center mb-8">
+                                    <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-wwe-red text-white">
+                                        Showing {wrestlers.find(w => w.id === selectedWrestler)?.name}'s gear
+                                        <button
+                                            onClick={clearFilter}
+                                            className="ml-2 text-white hover:text-gray-200"
+                                        >
+                                            ×
+                                        </button>
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Wrestlers Grid */}
+                            <div className="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide">
+                                {wrestlers.map((wrestler) => (
+                                    <div
+                                        key={wrestler.id}
+                                        onClick={() => handleWrestlerClick(wrestler.id)}
+                                        className={`flex-shrink-0 text-center cursor-pointer transition-all duration-300 hover:scale-110 ${
+                                            selectedWrestler === wrestler.id ? 'ring-4 ring-wwe-red ring-opacity-50' : ''
+                                        }`}
+                                    >
+                                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
+                                            <img
+                                                src={wrestler.image}
+                                                alt={wrestler.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <p className="mt-3 text-sm md:text-base font-medium text-gray-900">
+                                            {wrestler.name}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Products Grid */}
+                    <div className="py-16 bg-gray-50">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
+                                {selectedWrestler ? `${wrestlers.find(w => w.id === selectedWrestler)?.name}'s Gear` : 'All Products'}
+                            </h2>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {filteredProducts.map((product) => (
+                                    <div
+                                        key={product.id}
+                                        className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
+                                    >
+                                        <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-lg">
+                                            <img
+                                                src={product.image}
+                                                alt={product.name}
+                                                className="w-full h-64 object-cover"
+                                            />
+                                        </div>
+                                        <div className="p-4">
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                                                {product.name}
+                                            </h3>
+                                            <p className="text-2xl font-bold text-wwe-red">
+                                                ${product.price}
+                                            </p>
+                                            <button className="w-full mt-4 bg-wwe-red text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium">
+                                                Add to Cart
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {filteredProducts.length === 0 && (
+                                <div className="text-center py-12">
+                                    <p className="text-gray-500 text-lg">No products found for this superstar.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Footer */}
+                    <footer className="bg-gray-900 text-white py-12">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                                <div>
+                                    <h3 className="text-lg font-semibold mb-4">WWE Apparel</h3>
+                                    <p className="text-gray-400">
+                                        Official merchandise from your favorite WWE Superstars.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+                                    <ul className="space-y-2 text-gray-400">
+                                        <li><a href="#" className="hover:text-white transition-colors">Home</a></li>
+                                        <li><a href="#" className="hover:text-white transition-colors">Superstars</a></li>
+                                        <li><a href="#" className="hover:text-white transition-colors">Apparel</a></li>
+                                        <li><a href="#" className="hover:text-white transition-colors">Sale</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold mb-4">Customer Service</h3>
+                                    <ul className="space-y-2 text-gray-400">
+                                        <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
+                                        <li><a href="#" className="hover:text-white transition-colors">Shipping Info</a></li>
+                                        <li><a href="#" className="hover:text-white transition-colors">Returns</a></li>
+                                        <li><a href="#" className="hover:text-white transition-colors">Size Guide</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold mb-4">Follow Us</h3>
+                                    <div className="flex space-x-4">
+                                        <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                                            </svg>
+                                        </a>
+                                        <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+                                            </svg>
+                                        </a>
+                                        <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.746-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                                <p>&copy; 2024 WWE Apparel. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        }
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+
+    <style>
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</body>
+</html>
