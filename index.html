@@ -22,43 +22,88 @@
         }
     </script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-black">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useMemo } = React;
 
-        // Sample data
+        // Superstars list in the exact requested order.
+        // Replace each `image` URL with an official WWE (or appropriate) image URL.
+        // Tip: Use square images for best circle cropping. Example source: WWE.com Superstars pages.
         const wrestlers = [
-            { id: 1, name: "John Cena", image: "https://via.placeholder.com/120x120/FF0000/FFFFFF?text=JC" },
-            { id: 2, name: "Roman Reigns", image: "https://via.placeholder.com/120x120/0066CC/FFFFFF?text=RR" },
-            { id: 3, name: "Becky Lynch", image: "https://via.placeholder.com/120x120/FFD700/000000?text=BL" },
-            { id: 4, name: "Seth Rollins", image: "https://via.placeholder.com/120x120/800080/FFFFFF?text=SR" },
-            { id: 5, name: "Charlotte Flair", image: "https://via.placeholder.com/120x120/FF69B4/FFFFFF?text=CF" },
-            { id: 6, name: "Brock Lesnar", image: "https://via.placeholder.com/120x120/000000/FFFFFF?text=BL" },
-            { id: 7, name: "Ronda Rousey", image: "https://via.placeholder.com/120x120/FF4500/FFFFFF?text=RR" },
-            { id: 8, name: "AJ Styles", image: "https://via.placeholder.com/120x120/32CD32/FFFFFF?text=AJ" }
+            // Main roster and groups
+            { id: 1, name: "Alexa Bliss", image: "https://via.placeholder.com/240x240/111827/FFFFFF?text=Alexa+Bliss" }, // TODO: replace with official image URL
+            { id: 2, name: "Becky Lynch", image: "https://via.placeholder.com/240x240/F59E0B/000000?text=Becky+Lynch" }, // TODO
+            { id: 3, name: "Bianca Belair", image: "https://via.placeholder.com/240x240/10B981/FFFFFF?text=Bianca+Belair" }, // TODO
+            { id: 4, name: "Brock Lesnar", image: "https://via.placeholder.com/240x240/000000/FFFFFF?text=Brock+Lesnar" }, // TODO
+            { id: 5, name: "Bron Breakker", image: "https://via.placeholder.com/240x240/6B7280/FFFFFF?text=Bron+Breakker" }, // TODO
+            { id: 6, name: "CM Punk", image: "https://via.placeholder.com/240x240/EF4444/FFFFFF?text=CM+Punk" }, // TODO
+            { id: 7, name: "Cody Rhodes", image: "https://via.placeholder.com/240x240/3B82F6/FFFFFF?text=Cody+Rhodes" }, // TODO
+            { id: 8, name: "Dominik Mysterio", image: "https://via.placeholder.com/240x240/8B5CF6/FFFFFF?text=Dominik+Mysterio" }, // TODO
+            { id: 9, name: "Drew McIntyre", image: "https://via.placeholder.com/240x240/374151/FFFFFF?text=Drew+McIntyre" }, // TODO
+            { id: 10, name: "Finn Bálor", image: "https://via.placeholder.com/240x240/111827/FFFFFF?text=Finn+Balor" }, // TODO
+            { id: 11, name: "IYO SKY", image: "https://via.placeholder.com/240x240/EC4899/FFFFFF?text=IYO+SKY" }, // TODO
+            { id: 12, name: "Jacob Fatu", image: "https://via.placeholder.com/240x240/0EA5E9/FFFFFF?text=Jacob+Fatu" }, // TODO
+            { id: 13, name: "Jey Uso", image: "https://via.placeholder.com/240x240/EF4444/FFFFFF?text=Jey+Uso" }, // TODO
+            { id: 14, name: "Kevin Owens", image: "https://via.placeholder.com/240x240/111827/FFFFFF?text=Kevin+Owens" }, // TODO
+            { id: 15, name: "LA Knight", image: "https://via.placeholder.com/240x240/F59E0B/000000?text=LA+Knight" }, // TODO
+            { id: 16, name: "Liv Morgan", image: "https://via.placeholder.com/240x240/EC4899/FFFFFF?text=Liv+Morgan" }, // TODO
+            { id: 17, name: "Penta", image: "https://via.placeholder.com/240x240/1F2937/FFFFFF?text=Penta" }, // TODO
+            { id: 18, name: "Randy Orton", image: "https://via.placeholder.com/240x240/6B7280/FFFFFF?text=Randy+Orton" }, // TODO
+            { id: 19, name: "Rey Fenix", image: "https://via.placeholder.com/240x240/22C55E/FFFFFF?text=Rey+Fenix" }, // TODO
+            { id: 20, name: "Rhea Ripley", image: "https://via.placeholder.com/240x240/9333EA/FFFFFF?text=Rhea+Ripley" }, // TODO
+            { id: 21, name: "Roman Reigns", image: "https://via.placeholder.com/240x240/2563EB/FFFFFF?text=Roman+Reigns" }, // TODO
+            { id: 22, name: "Seth Rollins", image: "https://via.placeholder.com/240x240/F59E0B/000000?text=Seth+Rollins" }, // TODO
+            { id: 23, name: "Tiffany Stratton", image: "https://via.placeholder.com/240x240/EAB308/000000?text=Tiffany+Stratton" }, // TODO
+            { id: 24, name: "Wyatt Sicks", image: "https://via.placeholder.com/240x240/111827/FFFFFF?text=Wyatt+Sicks" }, // TODO
+            { id: 25, name: "Judgment Day", image: "https://via.placeholder.com/240x240/4C1D95/FFFFFF?text=Judgment+Day" }, // TODO (group)
+            { id: 26, name: "- View All -", image: "https://via.placeholder.com/240x240/374151/FFFFFF?text=View+All" },
+            { id: 27, name: "Legends & Alumni", image: "https://via.placeholder.com/240x240/1F2937/FFFFFF?text=Legends+%26+Alumni" },
+            // Legends
+            { id: 28, name: '"Macho Man" Randy Savage', image: "https://via.placeholder.com/240x240/F59E0B/000000?text=Macho+Man" }, // TODO
+            { id: 29, name: '"Stone Cold" Steve Austin', image: "https://via.placeholder.com/240x240/111827/FFFFFF?text=Stone+Cold" }, // TODO
+            { id: 30, name: "Bray Wyatt", image: "https://via.placeholder.com/240x240/0EA5E9/FFFFFF?text=Bray+Wyatt" }, // TODO
+            { id: 31, name: "D-Generation X", image: "https://via.placeholder.com/240x240/22C55E/000000?text=DX" }, // TODO (group)
+            { id: 32, name: "Eddie Guerrero", image: "https://via.placeholder.com/240x240/EF4444/FFFFFF?text=Eddie+Guerrero" }, // TODO
+            { id: 33, name: "Hulk Hogan", image: "https://via.placeholder.com/240x240/F59E0B/000000?text=Hulk+Hogan" }, // TODO
+            { id: 34, name: "John Cena", image: "https://via.placeholder.com/240x240/EF4444/FFFFFF?text=John+Cena" }, // TODO
+            { id: 35, name: "nWo", image: "https://via.placeholder.com/240x240/000000/FFFFFF?text=nWo" }, // TODO (group)
+            { id: 36, name: "Razor Ramon", image: "https://via.placeholder.com/240x240/9333EA/FFFFFF?text=Razor+Ramon" }, // TODO
+            { id: 37, name: "Shawn Michaels", image: "https://via.placeholder.com/240x240/E11D48/FFFFFF?text=Shawn+Michaels" }, // TODO
+            { id: 38, name: "The Rock", image: "https://via.placeholder.com/240x240/1F2937/FFFFFF?text=The+Rock" }, // TODO
+            { id: 39, name: "The Undertaker", image: "https://via.placeholder.com/240x240/111827/FFFFFF?text=Undertaker" }, // TODO
+            { id: 40, name: "Triple H", image: "https://via.placeholder.com/240x240/16A34A/FFFFFF?text=Triple+H" } // TODO
         ];
 
         const products = [
-            { id: 1, name: "John Cena 'Never Give Up' T-Shirt", price: 29.99, wrestlerId: 1, image: "https://via.placeholder.com/300x300/FF0000/FFFFFF?text=Cena+Shirt" },
-            { id: 2, name: "Roman Reigns Tribal Chief Hoodie", price: 49.99, wrestlerId: 2, image: "https://via.placeholder.com/300x300/0066CC/FFFFFF?text=Reigns+Hoodie" },
-            { id: 3, name: "Becky Lynch 'The Man' Tank Top", price: 24.99, wrestlerId: 3, image: "https://via.placeholder.com/300x300/FFD700/000000?text=Lynch+Tank" },
-            { id: 4, name: "Seth Rollins 'Visionary' Jacket", price: 79.99, wrestlerId: 4, image: "https://via.placeholder.com/300x300/800080/FFFFFF?text=Rollins+Jacket" },
-            { id: 5, name: "Charlotte Flair 'Queen' Dress", price: 89.99, wrestlerId: 5, image: "https://via.placeholder.com/300x300/FF69B4/FFFFFF?text=Flair+Dress" },
-            { id: 6, name: "Brock Lesnar 'Beast' T-Shirt", price: 34.99, wrestlerId: 6, image: "https://via.placeholder.com/300x300/000000/FFFFFF?text=Lesnar+Shirt" },
-            { id: 7, name: "Ronda Rousey 'Rowdy' Leggings", price: 39.99, wrestlerId: 7, image: "https://via.placeholder.com/300x300/FF4500/FFFFFF?text=Rousey+Leggings" },
-            { id: 8, name: "AJ Styles 'Phenomenal' Jersey", price: 69.99, wrestlerId: 8, image: "https://via.placeholder.com/300x300/32CD32/FFFFFF?text=Styles+Jersey" },
-            { id: 9, name: "John Cena Cap", price: 19.99, wrestlerId: 1, image: "https://via.placeholder.com/300x300/FF0000/FFFFFF?text=Cena+Cap" },
-            { id: 10, name: "Roman Reigns Wristband", price: 14.99, wrestlerId: 2, image: "https://via.placeholder.com/300x300/0066CC/FFFFFF?text=Reigns+Wristband" },
-            { id: 11, name: "Becky Lynch Sunglasses", price: 29.99, wrestlerId: 3, image: "https://via.placeholder.com/300x300/FFD700/000000?text=Lynch+Glasses" },
-            { id: 12, name: "Seth Rollins Beanie", price: 24.99, wrestlerId: 4, image: "https://via.placeholder.com/300x300/800080/FFFFFF?text=Rollins+Beanie" }
+            { id: 1, name: "John Cena 'Never Give Up' T-Shirt", price: 29.99, wrestlerId: 34, image: "https://via.placeholder.com/300x300/EF4444/FFFFFF?text=Cena+Shirt" },
+            { id: 2, name: "Roman Reigns Tribal Chief Hoodie", price: 49.99, wrestlerId: 21, image: "https://via.placeholder.com/300x300/2563EB/FFFFFF?text=Reigns+Hoodie" },
+            { id: 3, name: "Becky Lynch 'The Man' Tank Top", price: 24.99, wrestlerId: 2, image: "https://via.placeholder.com/300x300/F59E0B/000000?text=Lynch+Tank" },
+            { id: 4, name: "Seth Rollins 'Visionary' Jacket", price: 79.99, wrestlerId: 22, image: "https://via.placeholder.com/300x300/F59E0B/000000?text=Rollins+Jacket" },
+            { id: 5, name: "Rhea Ripley 'Mami' Tee", price: 34.99, wrestlerId: 20, image: "https://via.placeholder.com/300x300/9333EA/FFFFFF?text=Rhea+Ripley+Tee" },
+            { id: 6, name: "Brock Lesnar 'Beast' T-Shirt", price: 34.99, wrestlerId: 4, image: "https://via.placeholder.com/300x300/000000/FFFFFF?text=Lesnar+Shirt" },
+            { id: 7, name: "Liv Morgan 'ObLivion' Leggings", price: 39.99, wrestlerId: 16, image: "https://via.placeholder.com/300x300/EC4899/FFFFFF?text=Liv+Leggings" },
+            { id: 8, name: "Cody Rhodes 'Nightmare' Jersey", price: 69.99, wrestlerId: 7, image: "https://via.placeholder.com/300x300/3B82F6/FFFFFF?text=Cody+Jersey" },
+            { id: 9, name: "John Cena Cap", price: 19.99, wrestlerId: 34, image: "https://via.placeholder.com/300x300/EF4444/FFFFFF?text=Cena+Cap" },
+            { id: 10, name: "Roman Reigns Wristband", price: 14.99, wrestlerId: 21, image: "https://via.placeholder.com/300x300/2563EB/FFFFFF?text=Reigns+Wristband" },
+            { id: 11, name: "Becky Lynch Sunglasses", price: 29.99, wrestlerId: 2, image: "https://via.placeholder.com/300x300/F59E0B/000000?text=Lynch+Glasses" },
+            { id: 12, name: "Seth Rollins Beanie", price: 24.99, wrestlerId: 22, image: "https://via.placeholder.com/300x300/F59E0B/000000?text=Rollins+Beanie" }
         ];
 
         function App() {
             const [selectedWrestler, setSelectedWrestler] = useState(null);
-            const [filteredProducts, setFilteredProducts] = useState(products);
+            const [searchQuery, setSearchQuery] = useState("");
             const [isNavSticky, setIsNavSticky] = useState(false);
+            const [heroIndex, setHeroIndex] = useState(0);
+
+            // Hero slideshow images
+            // TODO: Replace with iconic WWE images (large, landscape) for production use
+            const heroSlides = [
+                "https://via.placeholder.com/1600x600/111827/FFFFFF?text=WWE+Arena+1", // replace with WWE arena image
+                "https://via.placeholder.com/1600x600/1F2937/FFFFFF?text=WWE+Arena+2", // replace with iconic match image
+                "https://via.placeholder.com/1600x600/000000/FFFFFF?text=WWE+Championship" // replace with championship image
+            ];
 
             useEffect(() => {
                 const handleScroll = () => {
@@ -69,34 +114,87 @@
                 return () => window.removeEventListener('scroll', handleScroll);
             }, []);
 
+            // Cycle hero slides every 4 seconds with crossfade
+            useEffect(() => {
+                const intervalId = setInterval(() => {
+                    setHeroIndex((prev) => (prev + 1) % heroSlides.length);
+                }, 4000);
+                return () => clearInterval(intervalId);
+            }, [heroSlides.length]);
+
             const handleWrestlerClick = (wrestlerId) => {
-                if (selectedWrestler === wrestlerId) {
-                    setSelectedWrestler(null);
-                    setFilteredProducts(products);
-                } else {
-                    setSelectedWrestler(wrestlerId);
-                    setFilteredProducts(products.filter(product => product.wrestlerId === wrestlerId));
+                if (wrestlerId === 26) {
+                    // "- View All -" special entry
+                    clearFilter();
+                    return;
                 }
+                setSelectedWrestler((prev) => (prev === wrestlerId ? null : wrestlerId));
             };
 
             const clearFilter = () => {
                 setSelectedWrestler(null);
-                setFilteredProducts(products);
+                setSearchQuery("");
+            };
+
+            const filteredProducts = useMemo(() => {
+                const lowered = searchQuery.trim().toLowerCase();
+                return products.filter((product) => {
+                    const matchesWrestler = selectedWrestler ? product.wrestlerId === selectedWrestler : true;
+                    const matchesSearch = lowered ? product.name.toLowerCase().includes(lowered) : true;
+                    return matchesWrestler && matchesSearch;
+                });
+            }, [selectedWrestler, searchQuery]);
+
+            const scrollToId = (id) => {
+                const el = document.getElementById(id);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+
+            const openShopPage = () => {
+                const w = window.open('', '_blank');
+                if (!w) return;
+                // Simple WWE-themed page content
+                w.document.write(`<!DOCTYPE html><html><head><title>Shop - WWE Apparel</title>
+                    <meta name='viewport' content='width=device-width, initial-scale=1'/>
+                    <style>
+                        body{margin:0;background:#000;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
+                        .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+                        .overlay{position:absolute;inset:0;background:linear-gradient(45deg,rgba(255,0,0,.6),rgba(0,0,0,.7))}
+                        .content{position:relative;z-index:1;text-align:center;padding:24px}
+                        h1{font-size:clamp(28px,6vw,56px);margin:0 0 16px;font-weight:800;letter-spacing:.5px}
+                        p{font-size:clamp(16px,3.5vw,22px);opacity:.9}
+                        .card{margin-top:24px;border:1px solid #333;border-radius:12px;padding:16px;display:inline-block;background:#0b0b0b}
+                        a{color:#ffd700;text-decoration:none}
+                        a:hover{opacity:.9}
+                    </style>
+                </head><body>
+                    <div class='hero'>
+                        <div class='overlay'></div>
+                        <div class='content'>
+                            <h1>Shop WWE Apparel</h1>
+                            <div class='card'>
+                                <p>To buy products, call <strong>XXXXXXXX</strong><br/>or join our WhatsApp group: <a href='XYZ_LINK' target='_blank' rel='noopener noreferrer'>XYZ_LINK</a></p>
+                                <!-- TODO: Replace phone and WhatsApp link above -->
+                            </div>
+                        </div>
+                    </div>
+                </body></html>`);
+                w.document.close();
             };
 
             return (
-                <div className="min-h-screen bg-gray-50">
+                <div className="min-h-screen bg-black">
                     {/* Navigation Bar */}
-                    <nav className={`bg-white shadow-lg transition-all duration-300 ${isNavSticky ? 'sticky top-0 z-50' : ''}`}>
+                    <nav className={`bg-gray-900/90 backdrop-blur shadow-lg transition-all duration-300 ${isNavSticky ? 'sticky top-0 z-50' : ''}`}>
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="flex justify-between items-center h-16">
                                 {/* Logo */}
                                 <div className="flex-shrink-0">
                                     <div className="flex items-center">
-                                        <div className="w-10 h-10 bg-wwe-red rounded-full flex items-center justify-center">
-                                            <span className="text-white font-bold text-lg">WWE</span>
+                                        <div className="w-10 h-10 bg-wwe-red rounded-full flex items-center justify-center shadow">
+                                            <span className="text-white font-bold text-lg tracking-tight">WWE</span>
                                         </div>
-                                        <span className="ml-2 text-xl font-bold text-gray-900">Apparel</span>
+                                        <span className="ml-2 text-xl font-bold text-white">Apparel</span>
                                     </div>
                                 </div>
 
@@ -106,9 +204,11 @@
                                         <input
                                             type="text"
                                             placeholder="Search for gear..."
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-wwe-red focus:border-transparent"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full px-4 py-2 bg-gray-800 text-gray-100 placeholder-gray-400 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-wwe-red focus:border-transparent"
                                         />
-                                        <button className="absolute right-2 top-2 text-gray-400 hover:text-wwe-red">
+                                        <button className="absolute right-2 top-2 text-gray-400 hover:text-wwe-red" aria-label="search">
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                             </svg>
@@ -118,10 +218,10 @@
 
                                 {/* Menu Links */}
                                 <div className="hidden md:flex items-center space-x-8">
-                                    <a href="#" className="text-gray-700 hover:text-wwe-red transition-colors duration-200">Home</a>
-                                    <a href="#" className="text-gray-700 hover:text-wwe-red transition-colors duration-200">Superstars</a>
-                                    <a href="#" className="text-gray-700 hover:text-wwe-red transition-colors duration-200">Apparel</a>
-                                    <a href="#" className="text-gray-700 hover:text-wwe-red transition-colors duration-200">Sale</a>
+                                    <a href="#" onClick={(e)=>{e.preventDefault(); window.scrollTo({top:0, behavior:'smooth'});}} className="text-gray-200 hover:text-wwe-gold transition-colors duration-200">Home</a>
+                                    <a href="#" onClick={(e)=>{e.preventDefault(); scrollToId('superstars');}} className="text-gray-200 hover:text-wwe-gold transition-colors duration-200">Superstars</a>
+                                    <a href="#" onClick={(e)=>{e.preventDefault(); scrollToId('products');}} className="text-gray-200 hover:text-wwe-gold transition-colors duration-200">Apparel</a>
+                                    <a href="#" onClick={(e)=>{e.preventDefault(); openShopPage();}} className="text-gray-200 hover:text-wwe-gold transition-colors duration-200">Shop</a>
                                 </div>
 
                                 {/* Mobile Menu Button */}
@@ -136,25 +236,40 @@
                         </div>
                     </nav>
 
-                    {/* Hero Section */}
-                    <div className="bg-gradient-to-r from-wwe-red to-wwe-blue text-white py-20">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                    {/* Hero Section with slideshow background */}
+                    <div id="hero" className="relative text-white py-20 overflow-hidden">
+                        {/* Background slides */}
+                        <div className="absolute inset-0">
+                            {heroSlides.map((src, idx) => (
+                                <img
+                                    key={idx}
+                                    src={src}
+                                    alt={`WWE hero slide ${idx+1}`}
+                                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${heroIndex === idx ? 'opacity-100' : 'opacity-0'}`}
+                                />
+                            ))}
+                            {/* Dark overlay for readability */}
+                            <div className="absolute inset-0 bg-black/60" />
+                            {/* Red/blue gradient belt overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-wwe-red/20 to-wwe-blue/20" />
+                        </div>
+                        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 drop-shadow">
                                 OFFICIAL WWE APPAREL
                             </h1>
-                            <p className="text-xl md:text-2xl mb-8">
+                            <p className="text-xl md:text-2xl mb-8 text-gray-200">
                                 Represent your favorite Superstars with authentic gear
                             </p>
-                            <button className="bg-wwe-gold text-black px-8 py-3 rounded-lg font-bold text-lg hover:bg-yellow-300 transition-colors duration-200">
+                            <button onClick={()=>scrollToId('products')} className="bg-wwe-gold text-black px-8 py-3 rounded-lg font-bold text-lg hover:bg-yellow-300 transition-colors duration-200">
                                 SHOP NOW
                             </button>
                         </div>
                     </div>
 
                     {/* Shop Superstars Section */}
-                    <div className="py-16 bg-white">
+                    <div id="belt" className="py-16 bg-gray-900">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
+                            <h2 className="text-3xl font-bold text-center mb-12 text-white">
                                 Shop Superstars
                             </h2>
                             
@@ -180,17 +295,17 @@
                                         key={wrestler.id}
                                         onClick={() => handleWrestlerClick(wrestler.id)}
                                         className={`flex-shrink-0 text-center cursor-pointer transition-all duration-300 hover:scale-110 ${
-                                            selectedWrestler === wrestler.id ? 'ring-4 ring-wwe-red ring-opacity-50' : ''
+                                            selectedWrestler === wrestler.id ? 'ring-4 ring-wwe-gold ring-opacity-60 rounded-full' : ''
                                         }`}
                                     >
-                                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
+                                        <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
                                             <img
                                                 src={wrestler.image}
                                                 alt={wrestler.name}
                                                 className="w-full h-full object-cover"
                                             />
                                         </div>
-                                        <p className="mt-3 text-sm md:text-base font-medium text-gray-900">
+                                        <p className="mt-3 text-sm md:text-base font-medium text-gray-100">
                                             {wrestler.name}
                                         </p>
                                     </div>
@@ -199,10 +314,27 @@
                         </div>
                     </div>
 
-                    {/* Products Grid */}
-                    <div className="py-16 bg-gray-50">
+                    {/* All Superstars Section (grid) */}
+                    <section id="superstars" className="py-16 bg-black">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
+                            <h2 className="text-3xl font-bold text-center mb-12 text-white">All Superstars</h2>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                                {wrestlers.map((w) => (
+                                    <div key={`grid-${w.id}`} className="text-center group" onClick={() => { handleWrestlerClick(w.id); scrollToId('products'); }}>
+                                        <div className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full overflow-hidden shadow-lg ring-0 group-hover:ring-4 group-hover:ring-wwe-red transition-all duration-300">
+                                            <img src={w.image} alt={w.name} className="w-full h-full object-cover" />
+                                        </div>
+                                        <p className="mt-3 text-sm md:text-base font-medium text-gray-100">{w.name}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Products Grid */}
+                    <div id="products" className="py-16 bg-black">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <h2 className="text-3xl font-bold text-center mb-12 text-white">
                                 {selectedWrestler ? `${wrestlers.find(w => w.id === selectedWrestler)?.name}'s Gear` : 'All Products'}
                             </h2>
                             
@@ -210,9 +342,9 @@
                                 {filteredProducts.map((product) => (
                                     <div
                                         key={product.id}
-                                        className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
+                                        className="bg-gray-900 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-800"
                                     >
-                                        <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-lg">
+                                        <div className="w-full overflow-hidden rounded-t-lg">
                                             <img
                                                 src={product.image}
                                                 alt={product.name}
@@ -220,10 +352,10 @@
                                             />
                                         </div>
                                         <div className="p-4">
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                                            <h3 className="text-lg font-semibold text-white mb-2 line-clamp-2">
                                                 {product.name}
                                             </h3>
-                                            <p className="text-2xl font-bold text-wwe-red">
+                                            <p className="text-2xl font-bold text-wwe-gold">
                                                 ${product.price}
                                             </p>
                                             <button className="w-full mt-4 bg-wwe-red text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium">
@@ -236,14 +368,14 @@
 
                             {filteredProducts.length === 0 && (
                                 <div className="text-center py-12">
-                                    <p className="text-gray-500 text-lg">No products found for this superstar.</p>
+                                    <p className="text-gray-400 text-lg">No products found for this superstar.</p>
                                 </div>
                             )}
                         </div>
                     </div>
 
                     {/* Footer */}
-                    <footer className="bg-gray-900 text-white py-12">
+                    <footer className="bg-gray-950 text-white py-12">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                                 <div>
@@ -255,10 +387,10 @@
                                 <div>
                                     <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
                                     <ul className="space-y-2 text-gray-400">
-                                        <li><a href="#" className="hover:text-white transition-colors">Home</a></li>
-                                        <li><a href="#" className="hover:text-white transition-colors">Superstars</a></li>
-                                        <li><a href="#" className="hover:text-white transition-colors">Apparel</a></li>
-                                        <li><a href="#" className="hover:text-white transition-colors">Sale</a></li>
+                                        <li><a href="#" onClick={(e)=>{e.preventDefault(); window.scrollTo({top:0, behavior:'smooth'});}} className="hover:text-white transition-colors">Home</a></li>
+                                        <li><a href="#" onClick={(e)=>{e.preventDefault(); scrollToId('superstars');}} className="hover:text-white transition-colors">Superstars</a></li>
+                                        <li><a href="#" onClick={(e)=>{e.preventDefault(); scrollToId('products');}} className="hover:text-white transition-colors">Apparel</a></li>
+                                        <li><a href="#" onClick={(e)=>{e.preventDefault(); openShopPage();}} className="hover:text-white transition-colors">Shop</a></li>
                                     </ul>
                                 </div>
                                 <div>
@@ -306,6 +438,7 @@
     </script>
 
     <style>
+        html { scroll-behavior: smooth; }
         .scrollbar-hide {
             -ms-overflow-style: none;
             scrollbar-width: none;
@@ -314,6 +447,7 @@
             display: none;
         }
         .line-clamp-2 {
+            line-clamp: 2; /* Standard property for compatibility */
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
