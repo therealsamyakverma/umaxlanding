@@ -96,6 +96,7 @@
             const [searchQuery, setSearchQuery] = useState("");
             const [isNavSticky, setIsNavSticky] = useState(false);
             const [heroIndex, setHeroIndex] = useState(0);
+            const [showSuperstarsSection, setShowSuperstarsSection] = useState(false);
 
             // Hero slideshow images
             // TODO: Replace with iconic WWE images (large, landscape) for production use
@@ -148,6 +149,16 @@
             const scrollToId = (id) => {
                 const el = document.getElementById(id);
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+
+            const toggleSuperstarsSection = () => {
+                setShowSuperstarsSection(prev => !prev);
+                // If showing the section, scroll to it after a brief delay to ensure it's rendered
+                if (!showSuperstarsSection) {
+                    setTimeout(() => {
+                        scrollToId('superstars');
+                    }, 100);
+                }
             };
 
             const openShopPage = () => {
@@ -219,7 +230,7 @@
                                 {/* Menu Links */}
                                 <div className="hidden md:flex items-center space-x-8">
                                     <a href="#" onClick={(e)=>{e.preventDefault(); window.scrollTo({top:0, behavior:'smooth'});}} className="text-gray-700 hover:text-sky-600 transition-colors duration-200">Home</a>
-                                    <a href="#" onClick={(e)=>{e.preventDefault(); scrollToId('superstars');}} className="text-gray-700 hover:text-sky-600 transition-colors duration-200">Superstars</a>
+                                    <a href="#" onClick={(e)=>{e.preventDefault(); toggleSuperstarsSection();}} className="text-gray-700 hover:text-sky-600 transition-colors duration-200">Superstars</a>
                                     <a href="#" onClick={(e)=>{e.preventDefault(); scrollToId('products');}} className="text-gray-700 hover:text-sky-600 transition-colors duration-200">Apparel</a>
                                     <a href="#" onClick={(e)=>{e.preventDefault(); openShopPage();}} className="text-gray-700 hover:text-sky-600 transition-colors duration-200">Shop</a>
                                 </div>
@@ -313,21 +324,23 @@
                     </div>
 
                     {/* All Superstars Section (grid) */}
-                    <section id="superstars" className="py-16 bg-sky-50">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">All Superstars</h2>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                                {wrestlers.map((w) => (
-                                    <div key={`grid-${w.id}`} className="text-center group" onClick={() => { handleWrestlerClick(w.id); scrollToId('products'); }}>
-                                        <div className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full overflow-hidden shadow-lg ring-0 group-hover:ring-4 group-hover:ring-sky-400 transition-all duration-300">
-                                            <img src={w.image} alt={w.name} className="w-full h-full object-cover" />
+                    {showSuperstarsSection && (
+                        <section id="superstars" className="py-16 bg-sky-50">
+                            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">All Superstars</h2>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                                    {wrestlers.map((w) => (
+                                        <div key={`grid-${w.id}`} className="text-center group" onClick={() => { handleWrestlerClick(w.id); scrollToId('products'); }}>
+                                            <div className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full overflow-hidden shadow-lg ring-0 group-hover:ring-4 group-hover:ring-sky-400 transition-all duration-300">
+                                                <img src={w.image} alt={w.name} className="w-full h-full object-cover" />
+                                            </div>
+                                            <p className="mt-3 text-sm md:text-base font-medium text-gray-800">{w.name}</p>
                                         </div>
-                                        <p className="mt-3 text-sm md:text-base font-medium text-gray-800">{w.name}</p>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    </section>
+                        </section>
+                    )}
 
                     {/* Products Grid */}
                     <div id="products" className="py-16 bg-sky-50">
